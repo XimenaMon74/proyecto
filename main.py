@@ -16,5 +16,29 @@ from nltk.tokenize import word_tokenize # word_tokenize nos ayuda a tokenizar te
 from nltk.corpus import wordnet # wordnet es una librería para analizar sinónimos.
 
 # Indicamos la ruta donde nltk buscará los datos descargados en nuestro computador.
-nltk.data.path.append ('C:\Users\USUARIO\AppData\Roaming\nltk_data')
-nltk.download('punkt')
+nltk.data.path.append (r"C:\Users\USUARIO\AppData\Roaming\nltk_data")
+nltk.download('punkt') # Es un paquete para dividir frases en palabras
+nltk.download('wordnet') # Paquete para encontrar sinónimos en palabras
+
+# Función para cargar las películas desde un archivo csv
+
+def load_movies():
+    # Leemos el archivo que contiene información de peliculas y seleccionamos las columnas más importantes
+    df = pd.read_csv(r"./Dataset/netflix_titles.csv")[['show_id','title','release_year','listed_in','rating','description']]
+    
+# Renombramos las columnas para que sean más fáciles de entender
+    df.colums = ['id','title','year','category','rating','overview']
+    
+# Llenamis los espacios vacíos con texto vacío y convertimos los datos en una lista de diccionarios
+    return df.fillna('').to_dict(orient='records')
+
+# Cargamos las películas al inicial la API para no leer el archivo cada vez que alguien pregunte por ellas
+movies_list = load_movies()
+
+# Función para encontrar sinonimos de una palabra
+def get_synonyms(word): 
+    # Usamos wordnet para encontrar distintas palabras que significan lo mismo
+    return{lemma.name().lower() for syn in wordnet.synset(word) for lemma in syn.lemmas()}
+
+# Creamos la aplicación FastAPI, que será el motor de nuestra API
+# Esto inicializa la API con un nombre y una versión
