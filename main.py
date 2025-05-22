@@ -27,7 +27,7 @@ def load_movies():
     df = pd.read_csv(r"./Dataset/netflix_titles.csv")[['show_id','title','release_year','listed_in','rating','description']]
     
 # Renombramos las columnas para que sean más fáciles de entender
-    df.colums = ['id','title','year','category','rating','overview']
+    df.columns = ['id','title','year','category','rating','overview']
     
 # Llenamis los espacios vacíos con texto vacío y convertimos los datos en una lista de diccionarios
     return df.fillna('').to_dict(orient='records')
@@ -48,3 +48,18 @@ app = FastAPI(title='Mi aplicación de películas', version='1.0.0')
 def home():
     # Cuando entremos en el navegador a http://127.0.0.1:8000 veremos un mensaje de bienvenida
     return HTMLResponse('<h1> Bienvenido a la API de peliculas </h1>')
+
+# Obteniendo la lista de películas
+# Creamos una ruta para obtener todas las películas
+# Ruta para obtener todas las películas
+@app.get('/movies', tags=['Movies'])
+def get_movies():
+    # Si hay películas, las enviamos, si no mostramos un error
+    return movies_list or HTMLResponse(status_code=500, detail="No hay datos de películas disponibles")
+
+# Ruta para obtener una película específica por su ID
+@app.get('/movies/{id}', tags=['Movies'])
+def get_movie(id: str):
+    # Buscamos en la lista de películas la que tenga el mismo ID
+    return next((m for m in movies_list if m['id'] == id), {"Detalle": "Película no encontrada"})
+
